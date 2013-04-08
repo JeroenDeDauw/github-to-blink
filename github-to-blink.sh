@@ -7,8 +7,8 @@ BLINK=`which blink1-tool`
 
 COLOR_PASS="0,200,50" # Mostly green
 
-SLEEPTIME=180  # Time to wait between checking git
-let COUNT=42  # Num of times to blink
+SLEEPTIME=10  # Time to wait between checking git
+let COUNT=10  # Num of times to blink
 
 # Inspired by the gmail example
 cleanup()
@@ -19,26 +19,9 @@ cleanup()
 }
 trap cleanup SIGINT SIGTERM
 
-# Load the repo from args
-REPO=$1
-if [[ -z $REPO ]]
-then
-    echo "Error Repo can not be empty." >&2
-    echo "Usage:"
-    echo "  ./github-to-blink <repo> "
-    echo ""
-    echo "For example ./github-to-blink todbot/blink1"
-    echo ""
-    exit 2
-fi
-
 while true; do
-    cTime=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-    sleep $SLEEPTIME
-    resp=$(curl -s https://api.github.com/repos/$REPO/commits?since="$cTime")
-    echo https://api.github.com/repos/$REPO/commits?since="$cTime"
-    echo $resp
-    if (("${#resp}">10))
+    resp=$(curl -s https://gerrit.wikimedia.org/r/changes/?q=(+project:mediawiki/extensions/Wikibase+OR+project:mediawiki/extensions/Diff+OR+project:mediawiki/extensions/DataValues+OR+project:mediawiki/extensions/WikibaseSolr+OR+project:mediawiki/extensions/Ask+)+status:merged+-age:10s&n=1)
+    if (("${#resp}">25))
     then
         echo "Commit found!"
         $BLINK --rgb $COLOR_PASS --blink $COUNT > /dev/null 2>&1
@@ -46,7 +29,6 @@ while true; do
     else
         echo "Waiting..."
         $BLINK --off > /dev/null 2>&1
+        sleep $SLEEPTIME
     fi
 done
-
-
