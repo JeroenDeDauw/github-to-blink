@@ -20,7 +20,7 @@ cleanup()
 trap cleanup SIGINT SIGTERM
 
 while true; do
-    resp=$(curl -s https://gerrit.wikimedia.org/r/changes/?q=(+project:mediawiki/extensions/Wikibase+OR+project:mediawiki/extensions/Diff+OR+project:mediawiki/extensions/DataValues+OR+project:mediawiki/extensions/WikibaseSolr+OR+project:mediawiki/extensions/Ask+)+status:merged+-age:10s&n=1)
+    resp=$(curl -s "https://gerrit.wikimedia.org/r/changes/?q=(+project:mediawiki/extensions/Wikibase+AND+-age:10s+AND+status:merged+)+OR+(+project:mediawiki/extensions/Diff+AND+-age:10s+AND+status:merged+)+OR+(+project:mediawiki/extensions/DataValues+AND+-age:10s+AND+status:merged+)+OR+(+project:mediawiki/extensions/Ask+AND+-age:10s+AND+status:merged+)+OR+(+project:mediawiki/extensions/WikibaseSolr+AND+-age:10s+AND+status:merged+)&n=1")
     if (("${#resp}">25))
     then
         echo "Commit found!"
